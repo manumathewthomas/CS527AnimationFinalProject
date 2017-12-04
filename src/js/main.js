@@ -38,6 +38,9 @@
     let matingpool = [];
     let generationCount = 1;
 
+    let arrow1, arrow2, arrow3;
+    let distanceFromRaycastVector1, distanceFromRaycastVector2, distanceFromRaycastVector3;
+
     let count = 0;
 
 
@@ -49,7 +52,7 @@
             this.maxSpeed = 0.4;
             this.maxForce = 0.1;
             this.geometry = new THREE.ConeGeometry(3, 5, 32);
-            this.axis = new THREE.Vector3(0, 1, 0);
+            this.axis = new THREE.Vector3(1, 0, 0);
             this.material = new THREE.MeshBasicMaterial({
                 color: 0xd9d9d9
             });
@@ -67,7 +70,7 @@
               let distance = this.mesh.position.distanceTo(target);
               this.fitness = (1/distance);
               if(this.completed)
-                this.fitness *= 50;
+                this.fitness *= 100;
               else
                 this.fitness /= 10;
 
@@ -77,10 +80,9 @@
                 this.fitness *= 50;
             
               if(this.mesh.position.y < 30 && this.mesh.position.y > 70)
-                this.fitness /= 20;
+                this.fitness /= 50;
               else
                 this.fitness *= 50;          
-
             
             }
         }
@@ -117,7 +119,7 @@
 
 
     let DNA = function(newGenes) {
-      console.log("DNA");
+     
       let genes = [];
 
       _.times(lifeSpan, function(i){
@@ -135,8 +137,6 @@
         if(d.fitness > maxFit) 
           maxFit = d.fitness;
       });
-
-      console.log(maxFit, generationCount);
 
       _.forEach(planes, function(d) {
         d.fitness /= maxFit;
@@ -219,9 +219,9 @@
 
 
 
-        targetBoundingGeometry = new THREE.SphereGeometry(5, 30, 30);
+        targetBoundingGeometry = new THREE.SphereGeometry(10, 30, 30);
         let targetBoundingMaterial = new THREE.MeshPhongMaterial({
-            color: 0xde2d26,
+            color: 0x88419d,
             transparent: true,
             opacity: 0.7,
             FlatShading: true
@@ -237,9 +237,9 @@
         targetControl.attach(targetBoundingMesh);
         transformControls.push(targetControl);
 
-        let obstacleCubeControl = new THREE.TransformControls(camera, renderer.domElement);
+        let obstacleCubeControl1 = new THREE.TransformControls(camera, renderer.domElement);
 
-        obstacleCubeGeometry = new THREE.BoxGeometry(50, 50, 100);
+        obstacleCubeGeometry = new THREE.BoxGeometry(50, 200, 50);
         let obstacleMaterial = new THREE.MeshPhongMaterial({
             color: 0xaddd8e,
             transparent: true,
@@ -247,12 +247,12 @@
             FlatShading: true
         });
         obstacleCubeMesh = new THREE.Mesh(obstacleCubeGeometry, obstacleMaterial);
-        obstacleCubeMesh.position.set(0, 20, 0);
+        obstacleCubeMesh.position.set(60, 90, -35);
         obstacleCubeMesh.castShadow = true;
         obstacleCubeMesh.receiveShadow = true;
         scene.add(obstacleCubeMesh);
 
-        obstacleCubeBoundingGeometry = new THREE.BoxGeometry(50, 50, 100);
+        obstacleCubeBoundingGeometry = new THREE.BoxGeometry(50, 100, 50);
         let material = new THREE.MeshBasicMaterial({
             color: 0xffff00,
             transparent: true,
@@ -264,8 +264,59 @@
 
         objects.push(obstacleCubeBoundingMesh);
 
-        obstacleCubeControl.attach(obstacleCubeMesh);
-        transformControls.push(obstacleCubeControl);
+        obstacleCubeControl1.attach(obstacleCubeMesh);
+        transformControls.push(obstacleCubeControl1);
+
+        let obstacleCubeMesh2 = obstacleCubeMesh.clone();
+        obstacleCubeMesh2.position.set(60, 90, 35);
+        obstacleCubeMesh2.castShadow = true;
+        obstacleCubeMesh2.receiveShadow = true;
+        scene.add(obstacleCubeMesh2);
+
+        let obstacleCubeBoundingMesh2 = obstacleCubeBoundingMesh.clone();
+
+        obstacleCubeMesh2.add(obstacleCubeBoundingMesh2);
+
+        objects.push(obstacleCubeBoundingMesh2);
+
+        let obstacleCubeControl2 = new THREE.TransformControls(camera, renderer.domElement);
+
+        obstacleCubeControl2.attach(obstacleCubeMesh2);
+        transformControls.push(obstacleCubeControl2);
+
+        let obstacleCubeMesh3 = obstacleCubeMesh.clone();
+        obstacleCubeMesh3.position.set(90, 90, -100);
+        obstacleCubeMesh3.castShadow = true;
+        obstacleCubeMesh3.receiveShadow = true;
+        scene.add(obstacleCubeMesh3);
+
+        let obstacleCubeBoundingMesh3 = obstacleCubeBoundingMesh.clone();
+
+        obstacleCubeMesh3.add(obstacleCubeBoundingMesh3);
+
+        objects.push(obstacleCubeBoundingMesh3);
+
+        let obstacleCubeControl3 = new THREE.TransformControls(camera, renderer.domElement);
+
+        obstacleCubeControl3.attach(obstacleCubeMesh3);
+        transformControls.push(obstacleCubeControl3);
+
+        let obstacleCubeMesh4 = obstacleCubeMesh.clone();
+        obstacleCubeMesh4.position.set(90, 90, 100);
+        obstacleCubeMesh4.castShadow = true;
+        obstacleCubeMesh4.receiveShadow = true;
+        scene.add(obstacleCubeMesh4);
+
+        let obstacleCubeBoundingMesh4 = obstacleCubeBoundingMesh.clone();
+
+        obstacleCubeMesh4.add(obstacleCubeBoundingMesh4);
+
+        objects.push(obstacleCubeBoundingMesh4);
+
+        let obstacleCubeControl4 = new THREE.TransformControls(camera, renderer.domElement);
+
+        obstacleCubeControl4.attach(obstacleCubeMesh4);
+        transformControls.push(obstacleCubeControl4);
 
         plane = new AirPlane();
         plane.mesh.scale.set(.25, .25, .25);
@@ -320,7 +371,7 @@
         scene.add(hemisphereLight);
         scene.add(shadowLight);
 
-        gravityVector = new THREE.Vector3(0, -0.00098, 0);
+        gravityVector = new THREE.Vector3(0, -.00098, 0);
         upVector = new THREE.Vector3(0, 1, 0);
 
 
@@ -377,12 +428,61 @@
     }
 
     let checkCollision = function(plane) {
-        let raycaster = new THREE.Raycaster();
-        let steer = new THREE.Vector3();
-        raycaster.set(plane.mesh.position.clone(), plane.velocity.clone().normalize());
-        let d = raycaster.intersectObjects(objects);
 
-        if (d[0] && d[0].distance < 5) {
+        let angle = Math.PI / 3;
+        let planeVelocityVector1 = plane.velocity.clone();
+        let planeVelocityVector2 = plane.velocity.clone();
+        let planeVelocityVector3 = plane.velocity.clone();
+
+
+        let raycaster1 = new THREE.Raycaster();
+        raycaster1.set(plane.mesh.position.clone(), planeVelocityVector1.clone().normalize());
+
+        planeVelocityVector2.applyAxisAngle( upVector, angle );
+
+        let raycaster2 = new THREE.Raycaster();
+        raycaster2.set(plane.mesh.position.clone(), planeVelocityVector2.clone().normalize());
+
+
+        planeVelocityVector3.applyAxisAngle( upVector, -angle );
+
+        let raycaster3 = new THREE.Raycaster();
+        raycaster3.set(plane.mesh.position.clone(), planeVelocityVector3.clone().normalize());
+        
+        if(plane.mesh.visible == true)
+        {
+            if(arrow1)
+                scene.remove(arrow1);
+            if(arrow2)
+                scene.remove(arrow2);
+            if(arrow3)
+                scene.remove(arrow3);
+
+            arrow1 = new THREE.ArrowHelper(raycaster1.ray.direction, raycaster1.ray.origin, 30, 0x756bb1 );
+            scene.add(arrow1);
+
+            arrow2 =  new THREE.ArrowHelper(raycaster2.ray.direction, raycaster2.ray.origin, 30,  0xc51b8a );
+            scene.add(arrow2);
+
+            arrow3 =  new THREE.ArrowHelper(raycaster3.ray.direction, raycaster3.ray.origin, 30,  0x636363 );
+            scene.add(arrow3);
+        }
+       
+        
+        let d1 = raycaster1.intersectObjects(objects);
+        let d2 = raycaster2.intersectObjects(objects);
+        let d3 = raycaster3.intersectObjects(objects);
+        
+
+        if (d1[0] && d1[0].distance < 15) {
+          plane.crashed = true;
+        }
+
+        if (d2[0] && d2[0].distance < 15) {
+          plane.crashed = true;
+        }
+
+        if (d3[0] && d3[0].distance < 15) {
           plane.crashed = true;
         }
     }
@@ -407,7 +507,6 @@
           plane.velocity.clampLength(plane.velocity.length(), plane.maxSpeed);
 
           plane.mesh.quaternion.setFromUnitVectors(plane.axis, plane.velocity.clone().normalize());
-          console.log(plane.mesh.quaternion);
 
           plane.mesh.position.add(plane.velocity);
 
@@ -459,6 +558,7 @@
 
     }
 
+    // Airplane Geometry description from https://codepen.io/carrot-e/full/WGkJBZ
 
     let AirPlane = function() {
 
@@ -584,7 +684,7 @@
         gui.add(control, "displayColliders").onChange(function(checked) {
             if (checked) {
                 _.forEach(objects, function(d) {
-                    console.log(d)
+                 
                     if (d.parent.parent)
                         d.material.opacity = 0.2;
                 });
