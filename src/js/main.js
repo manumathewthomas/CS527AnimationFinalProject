@@ -33,7 +33,7 @@
 
     let lifeSpan = 200;
 
-    let population = 100;
+    let population = 200;
     let showPopulation = false;
     let matingpool = [];
     let generationCount = 1;
@@ -62,9 +62,17 @@
             this.crashed = false;
 
             if(genes)
-              this.genes = genes;
+            {
+                this.velocityGenes = genes.velocityGenes;
+                this.rotationGenes = genes.rotationGenes;
+            } 
             else
-              this.genes = DNA();
+            {
+                this.DNA = DNA();
+                console.log(this.DNA);
+                this.velocityGenes = this.DNA.velocityGenes;
+                this.rotationGenes = this.DNA.rotationGenes;
+            }
             this.fitness = 0;
             this.calculateFitness = function() {
               let distance = this.mesh.position.distanceTo(target);
@@ -120,14 +128,17 @@
 
     let DNA = function(newGenes) {
      
-      let genes = [];
+      let velocityGenes = [];
+      let rotationGenes = [];
 
       _.times(lifeSpan, function(i){
-          genes[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1);
-          genes[i].setLength(0.05);
+          velocityGenes[i] = new THREE.Vector3(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1);
+          velocityGenes[i].setLength(0.05);
+
+          rotationGenes[i] = new THREE.Vector3((Math.random()*360 * Math.PI)/180, (Math.random()*360 * Math.PI)/180, (Math.random()*360 * Math.PI)/180);
         });
   
-      return genes;
+      return {'velocityGenes': velocityGenes, 'rotationGenes': rotationGenes};
     }
 
     let evaluateFitness = function() {
@@ -165,30 +176,38 @@
 
       clearPlanes();
       createPlanes(population, newgenesCollection);
-
-
-    
     }
 
     let crossover = function(parentA, parentB) {
-      let newgenes = [];
+      let newVelocityGenes = [];
+      let newRotationGenes = [];
       let midpoint = _.random(0, lifeSpan);
       _.times(lifeSpan, function(i) {
           if(i > midpoint)
-              newgenes[i] = parentA.genes[i];
+          {
+            newVelocityGenes[i] = parentA.velocityGenes[i];
+            newRotationGenes[i] = parentA.rotationGenes[i];
+          }
+              
           else
-              newgenes[i] = parentB.genes[i];
+          {
+            newVelocityGenes[i] = parentB.velocityGenes[i];
+            newRotationGenes[i] = parentB.rotationGenes[i];
+          }
+              
       });
 
-      return newgenes;
+      return {'velocityGenes': newVelocityGenes, 'rotationGenes': newRotationGenes};
     }
 
     let mutation = function(childgene) {
+        
        _.times(lifeSpan, function(i) { 
           if(_.random(0.001, 0.9) < 0.01) {
 
-              childgene[i] = new THREE.Vector3(Math.random(), Math.random()*2-1, Math.random()*2-1);
-              childgene[i].setLength(0.05);
+              childgene.velocityGenes[i] = new THREE.Vector3(Math.random(), Math.random()*2-1, Math.random()*2-1);
+              childgene.velocityGenes[i].setLength(0.05);
+              childgene.rotationGenes[i] = new THREE.Vector3((Math.random()*360 * Math.PI)/180, (Math.random()*360 * Math.PI)/180, (Math.random()*360 * Math.PI)/180);
           } 
        });
 
@@ -247,12 +266,12 @@
             FlatShading: true
         });
         obstacleCubeMesh = new THREE.Mesh(obstacleCubeGeometry, obstacleMaterial);
-        obstacleCubeMesh.position.set(60, 90, -35);
+        obstacleCubeMesh.position.set(0, 90, -35);
         obstacleCubeMesh.castShadow = true;
         obstacleCubeMesh.receiveShadow = true;
         scene.add(obstacleCubeMesh);
 
-        obstacleCubeBoundingGeometry = new THREE.BoxGeometry(50, 100, 50);
+        obstacleCubeBoundingGeometry = new THREE.BoxGeometry(50, 200, 50);
         let material = new THREE.MeshBasicMaterial({
             color: 0xffff00,
             transparent: true,
@@ -268,7 +287,7 @@
         transformControls.push(obstacleCubeControl1);
 
         let obstacleCubeMesh2 = obstacleCubeMesh.clone();
-        obstacleCubeMesh2.position.set(60, 90, 35);
+        obstacleCubeMesh2.position.set(0, 90, 35);
         obstacleCubeMesh2.castShadow = true;
         obstacleCubeMesh2.receiveShadow = true;
         scene.add(obstacleCubeMesh2);
@@ -285,7 +304,7 @@
         transformControls.push(obstacleCubeControl2);
 
         let obstacleCubeMesh3 = obstacleCubeMesh.clone();
-        obstacleCubeMesh3.position.set(90, 90, -100);
+        obstacleCubeMesh3.position.set(0, 90, -100);
         obstacleCubeMesh3.castShadow = true;
         obstacleCubeMesh3.receiveShadow = true;
         scene.add(obstacleCubeMesh3);
@@ -302,7 +321,7 @@
         transformControls.push(obstacleCubeControl3);
 
         let obstacleCubeMesh4 = obstacleCubeMesh.clone();
-        obstacleCubeMesh4.position.set(90, 90, 100);
+        obstacleCubeMesh4.position.set(0, 90, 100);
         obstacleCubeMesh4.castShadow = true;
         obstacleCubeMesh4.receiveShadow = true;
         scene.add(obstacleCubeMesh4);
@@ -318,13 +337,28 @@
         obstacleCubeControl4.attach(obstacleCubeMesh4);
         transformControls.push(obstacleCubeControl4);
 
+        let obstacleCubeMesh5 = obstacleCubeMesh.clone();
+        obstacleCubeMesh5.position.set(0, 90, 150);
+        obstacleCubeMesh5.castShadow = true;
+        obstacleCubeMesh5.receiveShadow = true;
+        scene.add(obstacleCubeMesh5);
+
+        let obstacleCubeBoundingMesh5 = obstacleCubeBoundingMesh.clone();
+
+        obstacleCubeMesh5.add(obstacleCubeBoundingMesh5);
+
+        objects.push(obstacleCubeBoundingMesh5);
+
+        let obstacleCubeControl5 = new THREE.TransformControls(camera, renderer.domElement);
+
+        obstacleCubeControl5.attach(obstacleCubeMesh5);
+        transformControls.push(obstacleCubeControl5);
+        
+
         plane = new AirPlane();
         plane.mesh.scale.set(.25, .25, .25);
         plane.mesh.position.y = 100;
         plane.mesh.castShadow = true;
-
-
-
     }
 
     let init = function() {
@@ -474,15 +508,15 @@
         let d3 = raycaster3.intersectObjects(objects);
         
 
-        if (d1[0] && d1[0].distance < 15) {
+        if (d1[0] && d1[0].distance < 25) {
           plane.crashed = true;
         }
 
-        if (d2[0] && d2[0].distance < 15) {
+        if (d2[0] && d2[0].distance < 25) {
           plane.crashed = true;
         }
 
-        if (d3[0] && d3[0].distance < 15) {
+        if (d3[0] && d3[0].distance < 25) {
           plane.crashed = true;
         }
     }
@@ -498,8 +532,11 @@
 
         checkCollision(plane);
 
-        applyForce(plane, plane.genes[count]);
+        applyForce(plane, plane.velocityGenes[count]);
         applyForce(plane, gravityVector);
+        console.log(plane.rotationGenes[count]);
+       
+
 
         if(!plane.completed && !plane.crashed) {
 
@@ -507,6 +544,7 @@
           plane.velocity.clampLength(plane.velocity.length(), plane.maxSpeed);
 
           plane.mesh.quaternion.setFromUnitVectors(plane.axis, plane.velocity.clone().normalize());
+        //   plane.mesh.rotation.set(plane.rotationGenes[count]);
 
           plane.mesh.position.add(plane.velocity);
 
