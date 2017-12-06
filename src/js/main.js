@@ -35,6 +35,7 @@
 
     let population = 200;
     let showPopulation = false;
+    let showRaycastLine = false;
     let matingpool = [];
     let generationCount = 1;
 
@@ -69,7 +70,6 @@
             else
             {
                 this.DNA = DNA();
-                console.log(this.DNA);
                 this.velocityGenes = this.DNA.velocityGenes;
                 this.rotationGenes = this.DNA.rotationGenes;
             }
@@ -87,7 +87,7 @@
               else
                 this.fitness *= 50;
             
-              if(this.mesh.position.y < 30 && this.mesh.position.y > 70)
+              if(this.mesh.position.y < 30 && this.mesh.position.y > 130)
                 this.fitness /= 50;
               else
                 this.fitness *= 50;          
@@ -248,7 +248,7 @@
         targetBoundingMesh = new THREE.Mesh(targetBoundingGeometry, targetBoundingMaterial);
 
         scene.add(targetBoundingMesh);
-        targetBoundingMesh.position.set(150, 50, 0);
+        targetBoundingMesh.position.set(150, 100, 0);
 
         objects.push(targetBoundingMesh);
 
@@ -266,7 +266,7 @@
             FlatShading: true
         });
         obstacleCubeMesh = new THREE.Mesh(obstacleCubeGeometry, obstacleMaterial);
-        obstacleCubeMesh.position.set(0, 90, -35);
+        obstacleCubeMesh.position.set(-42, 90, 0);
         obstacleCubeMesh.castShadow = true;
         obstacleCubeMesh.receiveShadow = true;
         scene.add(obstacleCubeMesh);
@@ -287,7 +287,7 @@
         transformControls.push(obstacleCubeControl1);
 
         let obstacleCubeMesh2 = obstacleCubeMesh.clone();
-        obstacleCubeMesh2.position.set(0, 90, 35);
+        obstacleCubeMesh2.position.set(57, 90, 56);
         obstacleCubeMesh2.castShadow = true;
         obstacleCubeMesh2.receiveShadow = true;
         scene.add(obstacleCubeMesh2);
@@ -321,7 +321,7 @@
         transformControls.push(obstacleCubeControl3);
 
         let obstacleCubeMesh4 = obstacleCubeMesh.clone();
-        obstacleCubeMesh4.position.set(0, 90, 100);
+        obstacleCubeMesh4.position.set(-64, 90, 100);
         obstacleCubeMesh4.castShadow = true;
         obstacleCubeMesh4.receiveShadow = true;
         scene.add(obstacleCubeMesh4);
@@ -338,7 +338,7 @@
         transformControls.push(obstacleCubeControl4);
 
         let obstacleCubeMesh5 = obstacleCubeMesh.clone();
-        obstacleCubeMesh5.position.set(0, 90, 150);
+        obstacleCubeMesh5.position.set(40, 90, 200);
         obstacleCubeMesh5.castShadow = true;
         obstacleCubeMesh5.receiveShadow = true;
         scene.add(obstacleCubeMesh5);
@@ -364,7 +364,7 @@
     let init = function() {
 
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-        camera.position.set(50, 170, -300);
+        camera.position.set(-5, 140, -344);
 
 
         controls = new THREE.OrbitControls(camera, document.getElementById('contanier'));
@@ -483,7 +483,7 @@
         let raycaster3 = new THREE.Raycaster();
         raycaster3.set(plane.mesh.position.clone(), planeVelocityVector3.clone().normalize());
         
-        if(plane.mesh.visible == true)
+        if(plane.mesh.visible == true && showRaycastLine)
         {
             if(arrow1)
                 scene.remove(arrow1);
@@ -508,15 +508,15 @@
         let d3 = raycaster3.intersectObjects(objects);
         
 
-        if (d1[0] && d1[0].distance < 25) {
+        if (d1[0] && d1[0].distance < 5) {
           plane.crashed = true;
         }
 
-        if (d2[0] && d2[0].distance < 25) {
+        if (d2[0] && d2[0].distance < 5) {
           plane.crashed = true;
         }
 
-        if (d3[0] && d3[0].distance < 25) {
+        if (d3[0] && d3[0].distance < 5) {
           plane.crashed = true;
         }
     }
@@ -533,10 +533,7 @@
         checkCollision(plane);
 
         applyForce(plane, plane.velocityGenes[count]);
-        applyForce(plane, gravityVector);
-        console.log(plane.rotationGenes[count]);
-       
-
+        applyForce(plane, gravityVector);       
 
         if(!plane.completed && !plane.crashed) {
 
@@ -691,6 +688,7 @@
         this.showPopulation = false;     
         this.displayTransform = false;
         this.displayColliders = false;
+        this.displayRayCastLines = false;
 
     };
 
@@ -722,7 +720,7 @@
         gui.add(control, "displayColliders").onChange(function(checked) {
             if (checked) {
                 _.forEach(objects, function(d) {
-                 
+                 console.log(d.parent.position);
                     if (d.parent.parent)
                         d.material.opacity = 0.2;
                 });
@@ -732,6 +730,22 @@
                         d.material.opacity = 0;
                 });
             }
+        });
+        gui.add(control, "displayRayCastLines").onChange(function(checked) {
+            if(checked) 
+                showRaycastLine = true;
+            else
+            {
+                if(arrow1)
+                    scene.remove(arrow1);
+                if(arrow2)
+                    scene.remove(arrow2);
+                if(arrow3)
+                    scene.remove(arrow3);
+                showRaycastLine = false;
+            }
+
+
         });
 
      
